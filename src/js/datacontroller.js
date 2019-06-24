@@ -27,7 +27,7 @@ class Income {
 
 }
 
-export  class Data  {
+export default class Data  {
     constructor(){
         this.allExpenses = {
             inc: new Array(),
@@ -41,12 +41,22 @@ export  class Data  {
         this.percentage = -1;
     }
 
+    calculateArraySum(type) {
+        var arrSum = 0;
+        var requiredArray = this.allExpenses[type];
+        
+        requiredArray.forEach(function(current, index, array){
+           arrSum += current.value; 
+        });
+        return arrSum;
+    }
+
     updateData(type, des, value) {
             
         let newItem, id;
         
         if(this.allExpenses[type].length  > 0) {
-            id = data.allExpenses[type][data.allExpenses[type].length - 1].id + 1;
+            id = this.allExpenses[type][this.allExpenses[type].length - 1].id + 1;
         } else {
             id = 0;
         }
@@ -64,33 +74,24 @@ export  class Data  {
     calculateBudget() {
             
         //1.calculating the total of the array
-        this.expense.income = calculateArraySum('inc');
-        this.expense.expense = calculateArraySum('exp');
+        this.expense.income = this.calculateArraySum('inc');
+        this.expense.expense = this.calculateArraySum('exp');
         
         //2.Calculating the budget
         this.budget = this.expense.income - this.expense.expense;
         
         //3.Calculating the percentages
         if(this.expense.income > 0) {
-            this.percentage = Math.round((data.expense.expense/data.expense.income) * 100);
+            this.percentage = Math.round((this.expense.expense/this.expense.income) * 100);
         } else {
             this.percentage = -1;
         }   
     }
 
-    calculateArraySum(type) {
-        var arrSum = 0;
-        var requiredArray = this.allExpenses[type];
-        
-        requiredArray.forEach(function(current, index, array){
-           arrSum += current.value; 
-        });
-        return arrSum;
-    }
-
     calculatePercentages() {
+        let totIncome = this.expense.income;
         this.allExpenses.exp.forEach( function(current) {
-            current.calcPercentages(data.expense.income);
+            current.calcPercentages(totIncome);
         });
     }
 
@@ -111,9 +112,10 @@ export  class Data  {
         index = idArray.indexOf(ID);
         
         if(index !== -1) {
-            data.allExpenses[type].splice(index, 1);
+            this.allExpenses[type].splice(index, 1);
         }
     }
+
 
     returnData() {
         return {
@@ -124,3 +126,4 @@ export  class Data  {
         };
     }
 };
+

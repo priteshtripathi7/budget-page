@@ -34,36 +34,6 @@ export const getInput =  function() {
 
 export const addItemToDOM =  function(ele, type) {
     var textToBeString, newTextToBeString, placeToInsert;
-    async function callDB(){
-        try{
-            const res = await fetch('http://localhost:3000/', {
-                method: 'get'
-            });
-            console.log(res);
-            const aft = await res.json();
-            aft.forEach(ele => {
-                //Create new HTML String
-                if(ele.type === 'inc') {
-                    placeToInsert = DOMSelector.incomeContainer;
-                    
-                    textToBeString = '<div class="item clearfix" id="inc-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
-                } else if (type === 'exp') {
-                    placeToInsert = DOMSelector.expenseContainer;
-                    
-                    textToBeString = '<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
-                }
-                newTextToBeString = textToBeString.replace('%id%', ele.id);
-                newTextToBeString = newTextToBeString.replace('%description%', ele.name);
-                newTextToBeString = newTextToBeString.replace('%value%', formatDisplay(ele.value, type));
-                
-                //Insert the new object into DOM
-                document.querySelector(placeToInsert).insertAdjacentHTML('beforeend', newTextToBeString);
-            })
-        }catch(error){
-            console.log(error);
-        }
-    }
-    callDB();
     //Create new HTML String
     if(type === 'inc') {
         placeToInsert = DOMSelector.incomeContainer;
