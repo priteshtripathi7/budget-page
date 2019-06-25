@@ -24,7 +24,6 @@ class Income {
         this.description = description;
         this.value = value;
     }
-
 }
 
 export default class Data  {
@@ -51,22 +50,56 @@ export default class Data  {
         return arrSum;
     }
 
-    updateData(type, des, value) {
-            
-        let newItem, id;
-        
-        if(this.allExpenses[type].length  > 0) {
-            id = this.allExpenses[type][this.allExpenses[type].length - 1].id + 1;
-        } else {
-            id = 0;
+    updateDataOnLoad(type, des, value, id){
+        let newItem;
+
+        if(type === 'inc') {
+            newItem = new Income(id, des, value);
+        } else if (type === 'exp') {
+            newItem = new Expense(id, des, value);
         }
-        
+
+        this.allExpenses[type].push(newItem);
+        return newItem;
+    }
+
+    updateData(type, des, value, id) {
+            
+        let newItem;
+
+        // TESTING
+        // console.log(type);
+        // console.log(this);
+
         if(type === 'inc') {
             newItem = new Income(id, des, value);
         } else if (type === 'exp') {
             newItem = new Expense(id, des, value);
         }
         
+        async function insertItemToDB(){
+            try{
+                const res = await fetch('http://localhost:3000/insertItem', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        username: 'priteshtri',
+                        id: id,
+                        des: des,
+                        value: value,
+                        type: type
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const after = await res.json();
+                console.log(after);
+            }catch(error){
+                console.log(error);
+                console.log('Error in data controller');
+            }
+        }
+        insertItemToDB();
         this.allExpenses[type].push(newItem);
         return newItem;
     }
@@ -104,7 +137,26 @@ export default class Data  {
     }
 
     deleteData(type, ID) {
-        var idArray, index
+        var idArray, index;
+
+        async function deleteFromDB(){
+            try{
+                const res = await fetch('http://localhost:3000/deleteItem', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        id: ID
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const after = await res.json();
+                console.log(after);
+            }catch(error){
+                console.log(error);
+            }
+        }
+        deleteFromDB();
         idArray = this.allExpenses[type].map(function(current) {
             return current.id;
         });

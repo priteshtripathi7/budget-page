@@ -2,7 +2,9 @@ import * as UICtrl from './uicontroller';
 import Data from './datacontroller';
 import { DOMSelector } from './base';
 
-let data = new Data();
+const uniqid = require('uniqid');
+
+var data = new Data();
 
 const setupEventListners = function() {
 
@@ -53,8 +55,10 @@ const ctrlAddEvents = function() {
     if(Input.inputDescription !== '' && !isNaN(Input.inputValue)) {
         
         //2.Add items to the data controller.
-        var newItem = data.updateData(Input.inputType, Input.inputDescription, Input.inputValue);
+        let id = uniqid();
 
+        var newItem = data.updateData(Input.inputType, Input.inputDescription, Input.inputValue, id);
+        console.log(newItem);
         //3.Add item to the UI
         UICtrl.addItemToDOM(newItem, Input.inputType);
 
@@ -77,7 +81,7 @@ const ctrlDeleteEvents = function(event) {
     if(item) {
         sliceID = item.split('-');
         type = sliceID[0];
-        ID = parseInt(sliceID[1]);
+        ID = sliceID[1];
         
         //1.Update the data structure
         data.deleteData(type, ID);
@@ -94,7 +98,6 @@ const ctrlDeleteEvents = function(event) {
 }
 
 const getDataFromDatabase = function(){
-    console.log('I was up');
     async function callDB(){
         try{
             const res = await fetch('http://localhost:3000/', {
@@ -108,15 +111,17 @@ const getDataFromDatabase = function(){
             });
             const aft = await res.json();
             aft.forEach(function(cur) {
-                var newItem = data.updateData(cur.type, cur.description, cur.value);
+                console.log(cur);
+                var newItem = data.updateDataOnLoad(cur.type, cur.description, cur.value, cur.id);
                 UICtrl.addItemToDOM(newItem, cur.type);
             })
-            
             UICtrl.clearInputs();
             dataCalculator();
             percentageCalculator();
-        }catch(error){
-            console.log(error);
+            
+        }catch(error) {
+            console.log(error.body);
+            window.alert('Error in indexjs');
         }
     }
     callDB();
@@ -124,9 +129,13 @@ const getDataFromDatabase = function(){
 
 const init =  function() {
     UICtrl.diaplayDate();
-    UICtrl.diaplayBudget({
-        
-    })
+    UICtrl.displayBudget({
+        budget: 0,
+        totalInc: 0,
+        totalExp: 0,
+        per: -1
+    });
     setupEventListners();
+    getDataFromDatabase();
 }
 init();
